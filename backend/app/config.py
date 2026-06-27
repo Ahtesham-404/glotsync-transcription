@@ -1,6 +1,6 @@
 """Application configuration loaded from environment variables.
 
-Requires Python 3.14+. All settings are loaded from environment variables
+Requires Python 3.13+. All settings are loaded from environment variables
 or a .env file — never hardcoded.
 """
 from functools import lru_cache

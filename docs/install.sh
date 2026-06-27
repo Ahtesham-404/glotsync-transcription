@@ -8,7 +8,7 @@ echo "=== GlotSync AI Installation ==="
 # System packages
 apt-get update -y
 apt-get install -y \
-    python3.14 python3.14-venv python3.14-dev \
+    python3.13 python3.13-venv python3.13-dev \
     postgresql postgresql-contrib \
     nginx certbot python3-certbot-nginx \
     git curl unzip build-essential \
@@ -28,7 +28,7 @@ else
 fi
 
 # Python virtualenv
-python3.14 -m venv /opt/glotsync/venv
+python3.13 -m venv /opt/glotsync/venv
 /opt/glotsync/venv/bin/pip install --upgrade pip
 /opt/glotsync/venv/bin/pip install -r /opt/glotsync/backend/requirements.txt
 
