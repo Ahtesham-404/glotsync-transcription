@@ -11,23 +11,30 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000,
+  // 5 minute timeout — needed for large file uploads and long transcription waits
+  timeout: 300000,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// Request interceptor: attach Firebase ID token and keep multipart intact
+// Request interceptor: attach Firebase ID token
+// For multipart/form-data (file uploads) we delete the Content-Type header so
+// the browser sets it automatically with the correct boundary string.
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    // Remove Content-Type for multipart so browser adds the correct boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
+    }
+
     const user = auth.currentUser
     if (user) {
       try {
-        // Force token refresh if it will expire within 5 minutes
         const token = await user.getIdToken(false)
         config.headers.Authorization = `Bearer ${token}`
       } catch {
-        // Token refresh failed — 401 handler below will sign the user out
+        // Token refresh failed — 401 handler will redirect to login
       }
     }
     return config
@@ -35,10 +42,9 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 )
 
-// Response interceptor: transform snake_case → camelCase and handle 401
+// Response interceptor: camelCase transform + 401 handler
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
-    // Transform response data keys to camelCase
     const contentType = response.headers['content-type']
     const isJson =
       typeof contentType === 'string'
@@ -54,11 +60,10 @@ apiClient.interceptors.response.use(
   },
   async (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Firebase token expired or invalid — sign out and redirect to login
       try {
         await auth.signOut()
       } catch {
-        // ignore sign out errors
+        // ignore
       }
       window.location.href = '/login'
     }

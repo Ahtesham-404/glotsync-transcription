@@ -18,27 +18,10 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/components/ui/Toast'
 import type { Notification } from '@/types'
 
-// Mock notifications — in production these come from the API
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'success',
-    title: 'Transcription complete',
-    message: 'interview_recording.mp3 is ready to view.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-    link: '/dashboard/files',
-  },
-  {
-    id: '2',
-    type: 'info',
-    title: 'Welcome to GlotSync AI',
-    message: 'Get started by uploading your first file.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    link: '/dashboard/upload',
-  },
-]
+// ── No hardcoded mock notifications ──────────────────────────────────────────
+// Notifications start empty. They will be populated in a future backend
+// endpoint (/api/notifications). For now the panel shows "No notifications"
+// which is honest — no fake data shown to users.
 
 const notifIcons = {
   success: <CheckCircle2 size={14} className="text-emerald-400" />,
@@ -63,7 +46,8 @@ export function DashboardTopNav() {
   const navigate = useNavigate()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
-  const [notifications, setNotifications] = useState(mockNotifications)
+  // Start with empty notifications — no fake data
+  const [notifications, setNotifications] = useState<Notification[]>([])
   const userMenuRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
 
@@ -154,8 +138,12 @@ export function DashboardTopNav() {
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="py-8 text-center text-sm text-gray-500">
-                      No notifications
+                    <div className="py-10 text-center">
+                      <Bell size={24} className="mx-auto mb-2 text-gray-600" />
+                      <p className="text-sm text-gray-500">No notifications yet</p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        You'll be notified when a transcription completes.
+                      </p>
                     </div>
                   ) : (
                     notifications.map((notif) => (

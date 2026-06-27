@@ -10,6 +10,8 @@ import {
   type User,
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -47,6 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Handle the redirect result when the user returns from Google sign-in.
+    // This fires when signInWithRedirect() was used as a popup fallback.
+    getRedirectResult(auth).catch(() => {
+      // Silently ignore — no redirect was in progress
+    })
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser)
       setLoading(false)
@@ -56,7 +64,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = useCallback(async () => {
     await setPersistence(auth, browserLocalPersistence)
-    await signInWithPopup(auth, googleProvider)
+
+    try {
+      // Try popup first (best UX)
+      await signInWithPopup(auth, googleProvider)
+    } catch (popupError) {
+      const code = (popupError as { code?: string }).code ?? ''
+
+      // These codes mean the popup was blocked or closed by the user/browser.
+      // Fall back to redirect-based sign-in which works in all environments
+      // including Cloudflare Pages where popups may be restricted.
+      if (
+        code === 'auth/popup-blocked' ||
+        code === 'auth/popup-closed-by-user' ||
+        code === 'auth/cancelled-popup-request'
+      ) {
+        await signInWithRedirect(auth, googleProvider)
+        return
+      }
+
+      // Any other error (network, misconfiguration) — re-throw so the UI
+      // can display a meaningful message
+      throw popupError
+    }
   }, [])
 
   const signInWithEmail = useCallback(
