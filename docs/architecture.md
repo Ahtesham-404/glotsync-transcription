@@ -69,7 +69,7 @@ Browser          Firebase           Backend            Database
 5. API returns { fileId, jobId }
 6. Background worker (Celery/ARQ) picks up job:
    a. Downloads file from S3
-   b. Sends to Whisper API
+   b. Sends to Amazon Transcribe
    c. Generates TXT, SRT, VTT
    d. Uploads transcripts to S3
    e. Updates Job (status: completed, transcript_id)
@@ -93,4 +93,4 @@ Browser          Firebase           Backend            Database
 | Hosting (FE) | Cloudflare Pages | Global CDN, free tier, edge network |
 | Hosting (BE) | AWS EC2 | Full control, cost-effective |
 | Storage | Amazon S3 | Durable, cheap, signed URLs |
-| Transcription | OpenAI Whisper | High accuracy, 50+ languages |
+| Transcription | Amazon Transcribe | High accuracy, 100+ languages, pay-per-use |

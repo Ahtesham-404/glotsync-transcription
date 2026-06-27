@@ -83,7 +83,7 @@ backend/
 │   ├── schemas.py         # Pydantic request/response schemas
 │   ├── auth.py            # Firebase token verification
 │   ├── storage.py         # S3 operations
-│   ├── transcription.py   # Whisper API integration
+│   ├── transcription.py   # Amazon Transcribe integration
 │   └── routers/
 │       ├── upload.py      # POST /api/upload
 │       ├── files.py       # GET/DELETE /api/files

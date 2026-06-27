@@ -52,7 +52,7 @@ GlotSync AI is a production-ready SaaS transcription platform. Upload any audio 
 | Migrations | Alembic |
 | Database | PostgreSQL 15 |
 | Storage | Amazon S3 |
-| Transcription | OpenAI Whisper API |
+| Transcription | Amazon Transcribe |
 | Hosting (FE) | Cloudflare Pages |
 | Hosting (BE) | AWS EC2 Ubuntu 22.04 |
 
@@ -84,7 +84,7 @@ glotsync-ai/
 │   │   ├── schemas.py         # Pydantic schemas
 │   │   ├── auth.py            # Firebase token verification
 │   │   ├── storage.py         # S3 operations (non-blocking)
-│   │   ├── transcription.py   # OpenAI Whisper integration
+│   │   ├── transcription.py   # Amazon Transcribe integration
 │   │   └── routers/           # upload, files, transcripts, dashboard
 │   ├── alembic/
 │   │   └── versions/          # 001_initial_schema.py
@@ -134,7 +134,7 @@ python3.13 -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env with your DB, AWS, Firebase, OpenAI credentials
+# Edit .env with your DB, AWS, Firebase, Amazon Transcribe credentials
 alembic upgrade head
 uvicorn app.main:app --reload
 # → http://localhost:8000
@@ -172,7 +172,7 @@ AWS_REGION=us-east-1
 S3_BUCKET_NAME=glotsync-files
 FIREBASE_PROJECT_ID=glotsync-199c1
 FIREBASE_SERVICE_ACCOUNT_PATH=/path/to/service-account.json
-OPENAI_API_KEY=sk-...
+TRANSCRIBE_LANGUAGE_CODE=en-US
 ALLOWED_ORIGINS=http://localhost:5173
 ```
 

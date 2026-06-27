@@ -87,7 +87,11 @@ async def _run_transcription(
 
             # Run transcription
             try:
-                transcript_result = await transcription_service.transcribe(file_data, original_name)
+                transcript_result = await transcription_service.transcribe(
+                    file_data,
+                    original_name,
+                    s3_key=s3_key,
+                )
             except Exception as exc:
                 log.error("transcription_failed", job_id=str(job_id), error=str(exc))
                 job.status = "failed"

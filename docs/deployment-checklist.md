@@ -40,7 +40,7 @@ Use this checklist before every production deployment of GlotSync AI.
 - [ ] Ubuntu 22.04 LTS instance running
 - [ ] Elastic IP associated
 - [ ] Security group: inbound 443 (HTTPS), 22 (SSH from your IP only)
-- [ ] Security group: outbound all (for S3, Firebase, OpenAI API calls)
+- [ ] Security group: outbound all (for S3, Firebase, Amazon Transcribe API calls)
 
 ---
 
@@ -57,7 +57,7 @@ Use this checklist before every production deployment of GlotSync AI.
   - `S3_BUCKET_NAME`
   - `FIREBASE_PROJECT_ID`
   - `FIREBASE_SERVICE_ACCOUNT_PATH`
-  - `OPENAI_API_KEY`
+  - `TRANSCRIBE_LANGUAGE_CODE`
   - `ALLOWED_ORIGINS`
   - `APP_ENV=production`
   - `APP_SECRET_KEY` (random 64-char string)
@@ -107,7 +107,7 @@ Use this checklist before every production deployment of GlotSync AI.
 - [ ] Google Sign-In works end-to-end
 - [ ] Email registration works, verification email received
 - [ ] File upload completes and job appears as "Queued"
-- [ ] Transcription completes (requires `OPENAI_API_KEY`)
+- [ ] Transcription completes — job moves to "Completed" status
 - [ ] Transcript viewer displays correctly
 - [ ] Download TXT, SRT, VTT all work
 - [ ] Delete file works

@@ -68,6 +68,16 @@ This user will have minimal permissions — only what the app needs.
         "s3:HeadBucket"
       ],
       "Resource": "arn:aws:s3:::glotsync-files"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "transcribe:StartTranscriptionJob",
+        "transcribe:GetTranscriptionJob",
+        "transcribe:DeleteTranscriptionJob",
+        "transcribe:ListTranscriptionJobs"
+      ],
+      "Resource": "*"
     }
   ]
 }
@@ -308,7 +318,8 @@ S3_BUCKET_NAME=glotsync-files
 FIREBASE_PROJECT_ID=glotsync-199c1
 FIREBASE_SERVICE_ACCOUNT_PATH=/etc/glotsync/firebase-service-account.json
 
-OPENAI_API_KEY=sk-your-openai-api-key
+# Amazon Transcribe language code (e.g. en-US, en-GB, es-US, fr-FR)
+TRANSCRIBE_LANGUAGE_CODE=en-US
 
 MAX_FILE_SIZE_MB=500
 RATE_LIMIT_PER_MINUTE=60

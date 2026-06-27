@@ -26,12 +26,22 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql+asyncpg://glotsync:glotsync@localhost:5432/glotsync"
 
-    # AWS S3
+    # AWS — shared credentials for S3 and Amazon Transcribe
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
     aws_region: str = "us-east-1"
+
+    # Amazon S3
     s3_bucket_name: str = "glotsync-files"
     s3_signed_url_expiry: int = 900  # seconds
+
+    # Amazon Transcribe
+    # Language code used when starting a transcription job.
+    # Use "en-US" for US English. For automatic language detection set to "auto"
+    # and enable IdentifyLanguage in the Transcribe job settings (requires changes
+    # in transcription.py if you want that feature).
+    # Full list: https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html
+    transcribe_language_code: str = "en-US"
 
     # Firebase
     firebase_project_id: str = "glotsync-199c1"
@@ -43,10 +53,6 @@ class Settings(BaseSettings):
     # Rate limiting
     rate_limit_per_minute: int = 60
     rate_limit_upload_per_hour: int = 20
-
-    # Transcription
-    transcription_provider: str = "openai_whisper"
-    openai_api_key: str = ""
 
     @property
     def allowed_origins_list(self) -> List[str]:
