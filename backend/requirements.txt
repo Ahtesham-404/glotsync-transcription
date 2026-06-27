@@ -1,6 +1,5 @@
 # GlotSync AI — Backend Dependencies
 # Python 3.14 compatible (tested with Python 3.14.0+)
-# Generated: 2025-06-27 | Updated for Python 3.14 compatibility
 
 # ── Web Framework ─────────────────────────────────────────────────────────────
 fastapi==0.138.1
@@ -8,9 +7,9 @@ uvicorn[standard]==0.34.2
 gunicorn==23.0.0
 
 # ── Data Validation ───────────────────────────────────────────────────────────
-# pydantic 2.13+ ships pydantic-core with Python 3.14 wheel support
+# pydantic 2.13+ ships pydantic-core built with Python 3.14 wheel support
 pydantic==2.13.4
-pydantic-settings==2.8.2
+pydantic-settings==2.14.2
 
 # ── File Uploads ──────────────────────────────────────────────────────────────
 python-multipart==0.0.20
