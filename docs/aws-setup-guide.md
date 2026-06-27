@@ -235,14 +235,14 @@ sudo apt-get update && sudo apt-get upgrade -y
 
 # Install essentials
 sudo apt-get install -y \
-  python3.12 python3.12-venv python3.12-dev \
+  python3.14 python3.14-venv python3.14-dev \
   postgresql postgresql-contrib \
   nginx certbot python3-certbot-nginx \
   git curl build-essential libpq-dev \
   ffmpeg unzip
 
 # Check Python version
-python3.12 --version
+python3.14 --version
 ```
 
 ---
@@ -277,7 +277,7 @@ sudo chown glotsync:glotsync /opt/glotsync /var/log/glotsync
 sudo -u glotsync git clone https://github.com/YOUR_GITHUB/glotsync-ai.git /opt/glotsync/repo
 
 # Set up Python environment
-sudo -u glotsync python3.12 -m venv /opt/glotsync/venv
+sudo -u glotsync python3.14 -m venv /opt/glotsync/venv
 sudo -u glotsync /opt/glotsync/venv/bin/pip install --upgrade pip
 sudo -u glotsync /opt/glotsync/venv/bin/pip install -r /opt/glotsync/repo/backend/requirements.txt
 ```

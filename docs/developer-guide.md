@@ -25,7 +25,7 @@ npm run dev
 
 ```bash
 cd backend
-python3.12 -m venv venv
+python3.14 -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env

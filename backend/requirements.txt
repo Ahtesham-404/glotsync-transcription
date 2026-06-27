@@ -1,47 +1,43 @@
 # GlotSync AI — Backend Dependencies
-# Compatible with Python 3.10+ (including 3.14)
-# Pinned to exact versions for reproducible production installs.
-# Last updated: 2025-06-27
+# Python 3.14 compatible (tested with Python 3.14.0+)
+# Generated: 2025-06-27 | Updated for Python 3.14 compatibility
 
 # ── Web Framework ─────────────────────────────────────────────────────────────
 fastapi==0.138.1
 uvicorn[standard]==0.34.2
 gunicorn==23.0.0
 
-# ── Form / File Upload ────────────────────────────────────────────────────────
+# ── Data Validation ───────────────────────────────────────────────────────────
+# pydantic 2.13+ ships pydantic-core with Python 3.14 wheel support
+pydantic==2.13.4
+pydantic-settings==2.8.2
+
+# ── File Uploads ──────────────────────────────────────────────────────────────
 python-multipart==0.0.20
 
-# ── Data Validation ───────────────────────────────────────────────────────────
-pydantic==2.11.7
-pydantic-settings==2.9.1
-
 # ── Database ──────────────────────────────────────────────────────────────────
-sqlalchemy==2.0.41
-alembic==1.16.2
-
-# Async PostgreSQL driver (used by SQLAlchemy async engine)
+sqlalchemy==2.0.51
+alembic==1.18.4
 asyncpg==0.31.0
-
-# Sync PostgreSQL driver (used by Alembic CLI for offline migrations)
 psycopg2-binary==2.9.10
 
-# ── Amazon S3 ─────────────────────────────────────────────────────────────────
-boto3==1.38.32
+# ── Cloud Storage ─────────────────────────────────────────────────────────────
+boto3==1.38.0
 
-# ── Firebase Admin SDK (token verification + user management) ─────────────────
+# ── Authentication ────────────────────────────────────────────────────────────
 firebase-admin==7.0.0
-
-# ── HTTP Client (Whisper API calls) ───────────────────────────────────────────
-httpx==0.28.1
 
 # ── Rate Limiting ─────────────────────────────────────────────────────────────
 slowapi==0.1.9
 
-# ── Structured Logging ────────────────────────────────────────────────────────
-structlog==25.3.0
+# ── HTTP Client (transcription API calls) ────────────────────────────────────
+httpx==0.28.1
 
-# ── Environment Variables ─────────────────────────────────────────────────────
+# ── Environment ───────────────────────────────────────────────────────────────
 python-dotenv==1.1.0
 
-# ── Error Tracking (optional — remove if not using Sentry) ───────────────────
-sentry-sdk[fastapi]==2.28.0
+# ── Logging ───────────────────────────────────────────────────────────────────
+structlog==25.4.0
+
+# ── Error Tracking ────────────────────────────────────────────────────────────
+sentry-sdk[fastapi]==2.29.1
