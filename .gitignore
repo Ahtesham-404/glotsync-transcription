@@ -1,0 +1,15 @@
+# See frontend/.gitignore and backend/.gitignore for per-directory rules
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Secrets — NEVER commit
+*.pem
+*.p12
+*.pfx
+*service-account*.json

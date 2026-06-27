@@ -1,0 +1,150 @@
+/* Google Fonts — must come before all other rules */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #f0f4ff;
+  --color-brand-100: #e0e9ff;
+  --color-brand-200: #c7d7fe;
+  --color-brand-300: #a4bcfd;
+  --color-brand-400: #8098fb;
+  --color-brand-500: #6172f3;
+  --color-brand-600: #4a52e8;
+  --color-brand-700: #3d42d1;
+  --color-brand-800: #3237a8;
+  --color-brand-900: #2e3485;
+  --color-brand-950: #1c2050;
+
+  --color-surface-950: #06070f;
+  --color-surface-900: #0d0f1a;
+  --color-surface-800: #141626;
+  --color-surface-700: #1c1f33;
+  --color-surface-600: #252840;
+  --color-surface-500: #2f334d;
+  --color-surface-400: #3d4163;
+
+  --font-sans: 'Inter var', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: #06070f;
+    color: #e5e7eb;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  :focus-visible {
+    outline: 2px solid #6172f3;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: rgba(97, 114, 243, 0.3);
+    color: #f9fafb;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0d0f1a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #252840;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3d4163;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: rgba(20, 22, 38, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, #6172f3 0%, #8b5cf6 50%, #ec4899 100%);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #6172f3 0%, #a78bfa 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-blue {
+    background: linear-gradient(135deg, #6172f3 0%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow {
+    box-shadow: 0 0 40px rgba(97, 114, 243, 0.15);
+  }
+
+  .glow-lg {
+    box-shadow: 0 0 80px rgba(97, 114, 243, 0.2);
+  }
+
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* End of GlotSync AI CSS */;

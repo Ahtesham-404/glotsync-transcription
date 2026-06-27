@@ -1,0 +1,25 @@
+[Unit]
+Description=GlotSync AI FastAPI Backend
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=notify
+User=glotsync
+Group=glotsync
+WorkingDirectory=/opt/glotsync/backend
+EnvironmentFile=/etc/glotsync/environment
+ExecStart=/opt/glotsync/venv/bin/gunicorn \
+    --config /opt/glotsync/backend/gunicorn.conf.py \
+    app.main:app
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+RuntimeDirectory=gunicorn
+RuntimeDirectoryMode=0750
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
