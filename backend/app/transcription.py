@@ -16,6 +16,9 @@ AWS permissions required on the IAM user/role:
 """
 import asyncio
 import json
+import os
+import subprocess
+import tempfile
 import time
 import uuid
 from functools import partial
@@ -25,7 +28,7 @@ import boto3
 import structlog
 
 from app.config import get_settings
-from app.storage import download_from_s3
+from app.storage import download_from_s3, upload_to_s3
 
 log = structlog.get_logger(__name__)
 settings = get_settings()
@@ -81,6 +84,43 @@ TRANSCRIBE_FORMAT_MAP = {
 def _get_media_format(filename: str) -> str:
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     return TRANSCRIBE_FORMAT_MAP.get(ext, "mp4")
+
+
+def _extract_audio_to_flac(file_data: bytes, filename: str) -> bytes:
+    """
+    Extract a clean mono 16 kHz FLAC audio track from any uploaded media using
+    ffmpeg.
+
+    Amazon Transcribe rejects many real-world files: remuxed ``.mp4`` files are
+    often MPEG-TS, and ``.mov/.avi/.mkv`` containers aren't supported at all.
+    Normalizing to FLAC up front means every format we accept transcribes
+    reliably, and 16 kHz mono is the ideal input for speech recognition.
+
+    Runs in a thread executor (it's blocking/CPU-bound).
+    """
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "bin"
+    with tempfile.TemporaryDirectory(prefix="glotsync-") as tmp:
+        in_path = os.path.join(tmp, f"input.{ext}")
+        out_path = os.path.join(tmp, "audio.flac")
+        with open(in_path, "wb") as fh:
+            fh.write(file_data)
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", in_path,
+            "-vn",            # drop any video stream
+            "-ac", "1",       # mono
+            "-ar", "16000",   # 16 kHz
+            "-c:a", "flac",
+            out_path,
+        ]
+        proc = subprocess.run(cmd, capture_output=True)
+        if proc.returncode != 0 or not os.path.exists(out_path):
+            stderr = proc.stderr.decode("utf-8", "ignore")[-600:]
+            raise RuntimeError(f"ffmpeg audio extraction failed: {stderr}")
+
+        with open(out_path, "rb") as fh:
+            return fh.read()
 
 
 # ─── Synchronous helpers (run in executor to avoid blocking the event loop) ──
@@ -195,18 +235,23 @@ class TranscriptionService:
 
     async def transcribe(
         self,
-        file_data: bytes,         # kept for interface compatibility but not re-uploaded
+        file_data: bytes,         # raw uploaded bytes — transcoded to FLAC for Transcribe
         filename: str,
-        s3_key: str = "",         # S3 key of the already-uploaded file
+        s3_key: str = "",         # S3 key of the original uploaded file (kept for reference)
         language_code: str = "",  # e.g. "en-US" — empty = use settings default
     ) -> TranscriptionResult:
         """
-        Transcribe a file already stored in S3.
+        Transcribe an uploaded media file.
+
+        The raw bytes are transcoded to a clean FLAC audio track with ffmpeg and
+        uploaded to S3, then Amazon Transcribe runs against that audio. This
+        makes every accepted container/codec work, including remuxed mp4/mpegts
+        and mov/avi/mkv files that Transcribe would otherwise reject.
 
         Args:
-            file_data:     Raw bytes (unused — file is already in S3).
-            filename:      Original filename, used to detect media format.
-            s3_key:        S3 key of the uploaded file.
+            file_data:     Raw uploaded bytes (transcoded to FLAC).
+            filename:      Original filename, used to detect the input extension.
+            s3_key:        S3 key of the original uploaded file.
             language_code: BCP-47 language code override. Falls back to
                            TRANSCRIBE_LANGUAGE_CODE in settings.
 
@@ -214,14 +259,30 @@ class TranscriptionService:
             TranscriptionResult with text, segments, language, duration.
 
         Raises:
-            RuntimeError on Transcribe failure.
+            RuntimeError on extraction or Transcribe failure.
         """
         lang = language_code or settings.transcribe_language_code
-        s3_uri = f"s3://{settings.s3_bucket_name}/{s3_key}"
-        media_format = _get_media_format(filename)
 
         # Unique job name — Transcribe requires globally unique names per account
         job_name = f"glotsync-{uuid.uuid4().hex}"
+
+        loop = asyncio.get_event_loop()
+
+        # Extract a clean FLAC audio track so any supported container/codec works.
+        # (Amazon Transcribe rejects real-world mp4/mpegts and mov/avi/mkv inputs.)
+        try:
+            flac_bytes = await loop.run_in_executor(
+                None, partial(_extract_audio_to_flac, file_data, filename)
+            )
+        except Exception as exc:
+            log.error("audio_extract_failed", job_name=job_name, error=str(exc))
+            raise RuntimeError(f"Could not process media file: {exc}") from exc
+
+        # Upload the extracted audio for Transcribe to read
+        audio_key = f"transcribe-input/{job_name}.flac"
+        await upload_to_s3(flac_bytes, audio_key, "audio/flac")
+        s3_uri = f"s3://{settings.s3_bucket_name}/{audio_key}"
+        media_format = "flac"
 
         log.info(
             "transcribe_job_starting",
@@ -230,8 +291,6 @@ class TranscriptionService:
             format=media_format,
             lang=lang,
         )
-
-        loop = asyncio.get_event_loop()
 
         # Start the job
         try:
