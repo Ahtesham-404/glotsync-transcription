@@ -1,3 +1,4 @@
+// build: 2026-06-29
 import { QueryClient } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
