@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Upload, X, CheckCircle2, AlertCircle, FileAudio, FileVideo,
@@ -8,8 +8,39 @@ import { Button } from '@/components/ui/Button'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { JobStatusBadge } from '@/components/ui/Badge'
 import { useToast } from '@/components/ui/Toast'
+import { useJobStatus } from '@/hooks/useFiles'
 import apiClient from '@/lib/axios'
 import type { UploadItem } from '@/types'
+
+/**
+ * Invisible watcher that polls a transcription job's status and notifies the
+ * parent once it reaches a terminal state. One instance is mounted per
+ * in-flight job so the Upload page can move items from "processing" to
+ * "complete"/"error" without manual refresh.
+ */
+function JobWatcher({
+  jobId,
+  onDone,
+}: {
+  jobId: string
+  onDone: (status: 'completed' | 'failed', errorMessage?: string) => void
+}) {
+  const { data } = useJobStatus(jobId, true)
+  const firedRef = useRef(false)
+
+  useEffect(() => {
+    if (!data || firedRef.current) return
+    if (data.status === 'completed') {
+      firedRef.current = true
+      onDone('completed')
+    } else if (data.status === 'failed') {
+      firedRef.current = true
+      onDone('failed', data.errorMessage)
+    }
+  }, [data, onDone])
+
+  return null
+}
 
 const MAX_FILE_SIZE_MB = Number(import.meta.env.VITE_MAX_FILE_SIZE_MB) || 500
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
@@ -141,11 +172,41 @@ export function UploadPage() {
     items.filter((i) => i.status === 'pending').forEach((i) => uploadItem(i.id))
   }
 
+  const handleJobDone = useCallback(
+    (id: string, status: 'completed' | 'failed', errorMessage?: string) => {
+      setItems((prev) =>
+        prev.map((i) => {
+          if (i.id !== id) return i
+          return status === 'completed'
+            ? { ...i, status: 'complete', progress: 100 }
+            : { ...i, status: 'error', progress: 0, error: errorMessage || 'Transcription failed.' }
+        })
+      )
+      if (status === 'completed') {
+        toast.success('Transcription complete', 'Your transcript is ready to view.')
+      } else {
+        toast.error('Transcription failed', errorMessage || 'Please try uploading again.')
+      }
+    },
+    [toast]
+  )
+
   const pendingCount = items.filter((i) => i.status === 'pending').length
   const hasItems = items.length > 0
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      {/* Invisible pollers: move processing items to complete/error automatically */}
+      {items
+        .filter((i) => i.status === 'processing' && i.jobId)
+        .map((i) => (
+          <JobWatcher
+            key={i.jobId}
+            jobId={i.jobId as string}
+            onDone={(status, errorMessage) => handleJobDone(i.id, status, errorMessage)}
+          />
+        ))}
+
       <div>
         <h1 className="text-2xl font-bold text-gray-100">Upload Files</h1>
         <p className="text-gray-400 text-sm mt-1">
