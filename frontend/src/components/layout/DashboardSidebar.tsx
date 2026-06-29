@@ -10,10 +10,10 @@ import {
   Settings,
   User,
   HelpCircle,
-  Zap,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
+import { LogoMark } from '@/components/ui/Logo'
 import { useAuth } from '@/contexts/AuthContext'
 
 const navItems = [
@@ -51,9 +51,7 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
       {/* Logo */}
       <div className="flex items-center h-16 px-4 border-b border-surface-700/50 flex-shrink-0">
         <Link to="/" className="flex items-center gap-2.5 min-w-0" aria-label="GlotSync AI">
-          <div className="w-8 h-8 rounded-xl gradient-brand flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-900/40">
-            <Zap size={15} className="text-white" fill="white" />
-          </div>
+          <LogoMark size={32} className="flex-shrink-0" />
           <AnimatePresence>
             {!collapsed && (
               <motion.span

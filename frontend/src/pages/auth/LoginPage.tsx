@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff, Zap, AlertCircle } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { LogoMark } from '@/components/ui/Logo'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/contexts/AuthContext'
@@ -90,9 +91,7 @@ export function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-6">
-            <div className="w-10 h-10 rounded-2xl gradient-brand flex items-center justify-center shadow-lg shadow-brand-900/40">
-              <Zap size={20} className="text-white" fill="white" />
-            </div>
+            <LogoMark size={40} />
             <span className="font-bold text-xl text-white tracking-tight">
               Glot<span className="gradient-text">Sync</span>
               <span className="text-gray-400 font-normal"> AI</span>

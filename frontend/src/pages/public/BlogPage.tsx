@@ -12,7 +12,7 @@ const posts = [
     category: 'Technology',
     readTime: '8 min',
     date: 'June 20, 2025',
-    gradient: 'from-brand-600/20 to-purple-600/20',
+    gradient: 'from-brand-600/20 to-accent-600/20',
   },
   {
     slug: 'journalists-transcription-guide',
@@ -39,7 +39,7 @@ const posts = [
     category: 'SEO',
     readTime: '6 min',
     date: 'May 28, 2025',
-    gradient: 'from-sky-600/20 to-blue-600/20',
+    gradient: 'from-accent-600/20 to-brand-600/20',
   },
   {
     slug: 'legal-transcription-compliance',
@@ -48,7 +48,7 @@ const posts = [
     category: 'Legal',
     readTime: '7 min',
     date: 'May 20, 2025',
-    gradient: 'from-red-600/20 to-pink-600/20',
+    gradient: 'from-rose-600/20 to-brand-600/20',
   },
   {
     slug: 'accuracy-tips',
@@ -57,7 +57,7 @@ const posts = [
     category: 'Guides',
     readTime: '4 min',
     date: 'May 12, 2025',
-    gradient: 'from-violet-600/20 to-purple-600/20',
+    gradient: 'from-accent-600/20 to-brand-500/20',
   },
 ]
 

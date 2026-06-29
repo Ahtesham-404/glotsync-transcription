@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Zap, Mail, ExternalLink } from 'lucide-react'
+import { Mail, ExternalLink } from 'lucide-react'
+import { Logo } from '@/components/ui/Logo'
 
 const footerLinks = {
   Product: [
@@ -41,14 +42,8 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-4" aria-label="GlotSync AI home">
-              <div className="w-8 h-8 rounded-xl gradient-brand flex items-center justify-center">
-                <Zap size={16} className="text-white" fill="white" />
-              </div>
-              <span className="font-bold text-lg text-white tracking-tight">
-                Glot<span className="gradient-text">Sync</span>
-                <span className="text-gray-400 font-normal"> AI</span>
-              </span>
+            <Link to="/" className="inline-flex items-center mb-4" aria-label="GlotSync AI home">
+              <Logo size={34} />
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed mb-6 max-w-xs">
               Transform audio and video into accurate, searchable transcripts. Built for creators, businesses, and professionals.

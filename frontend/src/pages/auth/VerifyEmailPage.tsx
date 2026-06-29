@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Mail, Zap, CheckCircle2, RefreshCw, LogOut } from 'lucide-react'
+import { Mail, CheckCircle2, RefreshCw, LogOut } from 'lucide-react'
+import { LogoMark } from '@/components/ui/Logo'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/components/ui/Toast'
@@ -65,9 +66,7 @@ export function VerifyEmailPage() {
       >
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-6">
-            <div className="w-10 h-10 rounded-2xl gradient-brand flex items-center justify-center">
-              <Zap size={20} className="text-white" fill="white" />
-            </div>
+            <LogoMark size={40} />
             <span className="font-bold text-xl text-white tracking-tight">
               Glot<span className="gradient-text">Sync</span>
               <span className="text-gray-400 font-normal"> AI</span>

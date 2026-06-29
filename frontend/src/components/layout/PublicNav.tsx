@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Zap, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { Logo } from '@/components/ui/Logo'
 import { useAuth } from '@/contexts/AuthContext'
 
 const navLinks = [
@@ -49,16 +50,10 @@ export function PublicNav() {
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2.5 group"
+          className="flex items-center group"
           aria-label="GlotSync AI home"
         >
-          <div className="w-8 h-8 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-brand-900/40 group-hover:shadow-brand-800/60 transition-shadow">
-            <Zap size={16} className="text-white" fill="white" />
-          </div>
-          <span className="font-bold text-lg text-white tracking-tight">
-            Glot<span className="gradient-text">Sync</span>
-            <span className="text-gray-400 font-normal"> AI</span>
-          </span>
+          <Logo size={34} />
         </Link>
 
         {/* Desktop nav */}
