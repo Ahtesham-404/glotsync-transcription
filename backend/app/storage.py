@@ -55,6 +55,25 @@ def _sync_delete(s3_key: str) -> None:
     s3.delete_object(Bucket=settings.s3_bucket_name, Key=s3_key)
 
 
+def _sync_download(s3_key: str) -> bytes:
+    """Synchronous S3 download — runs in thread executor."""
+    s3 = get_s3_client()
+    response = s3.get_object(Bucket=settings.s3_bucket_name, Key=s3_key)
+    return response["Body"].read()
+
+
+async def download_from_s3(s3_key: str) -> bytes:
+    """Download an S3 object's bytes without blocking the event loop."""
+    loop = asyncio.get_event_loop()
+    try:
+        data = await loop.run_in_executor(None, partial(_sync_download, s3_key))
+        log.info("s3_download_success", key=s3_key, size=len(data))
+        return data
+    except ClientError as exc:
+        log.error("s3_download_failed", key=s3_key, error=str(exc))
+        raise
+
+
 async def upload_to_s3(
     file_data: bytes,
     s3_key: str,

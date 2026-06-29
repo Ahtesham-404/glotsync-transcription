@@ -22,10 +22,10 @@ from functools import partial
 from typing import Any
 
 import boto3
-import httpx
 import structlog
 
 from app.config import get_settings
+from app.storage import download_from_s3
 
 log = structlog.get_logger(__name__)
 settings = get_settings()
@@ -264,9 +264,13 @@ class TranscriptionService:
             log.debug("transcribe_poll", job_name=job_name, status=status, attempt=attempt)
 
             if status == "COMPLETED":
-                # Fetch the result JSON from S3
-                output_uri = job.get("Transcript", {}).get("TranscriptFileUri", "")
-                result_json = await self._fetch_result(output_uri)
+                # Fetch the result JSON from S3.
+                # Because we set OutputBucketName, Transcribe writes the result
+                # into our own bucket and the TranscriptFileUri is an
+                # authenticated S3 URL (NOT presigned). We must read it with
+                # credentials via boto3 rather than an anonymous HTTP GET.
+                output_key = f"transcribe-output/{job_name}.json"
+                result_json = await self._fetch_result(output_key)
                 text, segments, duration = _parse_transcribe_result(result_json)
 
                 # Detect the language Amazon Transcribe identified
@@ -298,20 +302,16 @@ class TranscriptionService:
             f"Transcription timed out after {max_polls * poll_interval // 60} minutes."
         )
 
-    async def _fetch_result(self, output_uri: str) -> dict:
+    async def _fetch_result(self, output_key: str) -> dict:
         """
-        Fetch the Transcribe JSON result.
+        Fetch the Amazon Transcribe JSON result from our own S3 bucket.
 
-        Amazon Transcribe puts the output in S3 and provides a pre-signed URL
-        in the TranscriptFileUri field. We fetch it directly via HTTPS.
+        When a custom OutputBucketName is configured, Transcribe stores the
+        result in that bucket. The object is private, so we read it with
+        authenticated S3 credentials and parse the JSON.
         """
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.get(output_uri)
-            if response.status_code != 200:
-                raise RuntimeError(
-                    f"Failed to fetch transcript result (HTTP {response.status_code})"
-                )
-            return response.json()
+        data = await download_from_s3(output_key)
+        return json.loads(data.decode("utf-8"))
 
 
 # ─── SRT / VTT formatters ─────────────────────────────────────────────────────

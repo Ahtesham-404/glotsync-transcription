@@ -241,7 +241,10 @@ async def upload_file(
     current_user.total_uploads += 1
     current_user.storage_used_bytes += file_size
 
-    await db.flush()
+    # Commit now so the File and Job rows are durably persisted BEFORE the
+    # background task starts. The task uses its own DB session and would
+    # otherwise race the request's deferred commit and fail to find the job.
+    await db.commit()
 
     # Dispatch transcription as a background task
     # The file bytes are passed directly to avoid re-fetching from S3
