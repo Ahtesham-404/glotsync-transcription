@@ -98,11 +98,14 @@ export function UploadPage() {
       const formData = new FormData()
       formData.append('file', item.file)
 
+      // Do NOT set Content-Type manually — the axios interceptor strips it for
+      // FormData so the browser can add the correct multipart boundary string.
       const { data } = await apiClient.post('/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        // Give uploads up to 10 minutes — large files need time to transfer
+        timeout: 600000,
         onUploadProgress: (evt) => {
           if (evt.total) {
-            const pct = Math.round((evt.loaded / evt.total) * 90) // up to 90% for upload
+            const pct = Math.round((evt.loaded / evt.total) * 90) // up to 90% for upload phase
             setItems((prev) =>
               prev.map((i) => i.id === id ? { ...i, progress: pct } : i)
             )
@@ -117,10 +120,16 @@ export function UploadPage() {
             : i
         )
       )
-      toast.success('Upload complete', `${item.file.name} is being transcribed.`)
+      toast.info('Uploading complete', `${item.file.name} is queued for transcription.`)
     } catch (err) {
-      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-        ?? 'Upload failed. Please try again.'
+      const axiosErr = err as { response?: { data?: { detail?: string }; status?: number } }
+      const msg =
+        axiosErr?.response?.data?.detail ??
+        (axiosErr?.response?.status === 413
+          ? `File too large. Maximum is ${MAX_FILE_SIZE_MB} MB.`
+          : axiosErr?.response?.status === 422
+          ? 'Unsupported file format.'
+          : 'Upload failed. Check your connection and try again.')
       setItems((prev) =>
         prev.map((i) => i.id === id ? { ...i, status: 'error', error: msg, progress: 0 } : i)
       )

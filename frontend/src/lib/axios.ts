@@ -11,8 +11,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  // 5 minute timeout — needed for large file uploads and long transcription waits
-  timeout: 300000,
+  // 15 second timeout for normal API requests.
+  // Upload requests override this via their own config (see UploadPage).
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },

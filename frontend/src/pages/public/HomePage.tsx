@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { fadeUpProps, fadeUpViewportProps } from '@/lib/motion'
+import { useAuth } from '@/contexts/AuthContext'
 
 const features = [
   { icon: Mic, title: 'Audio Transcription', desc: 'MP3, WAV, AAC, M4A, FLAC, OGG — all processed with high accuracy.' },
@@ -63,7 +64,12 @@ const faqs = [
 
 export function HomePage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [openFaq, setOpenFaq] = React.useState<number | null>(null)
+
+  // Logged-in users go to the dashboard; guests go to register
+  const ctaPath = user ? '/dashboard' : '/register'
+  const ctaLabel = user ? 'Go to Dashboard' : 'Get Started Free'
 
   return (
     <div>
@@ -98,8 +104,8 @@ export function HomePage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
             {...fadeUpProps(0.3)}
           >
-            <Button size="xl" variant="primary" iconRight={<ArrowRight size={18} />} onClick={() => navigate('/register')}>
-              Get Started Free
+            <Button size="xl" variant="primary" iconRight={<ArrowRight size={18} />} onClick={() => navigate(ctaPath)}>
+              {ctaLabel}
             </Button>
             <Button size="xl" variant="outline" onClick={() => navigate('/pricing')}>
               View Pricing
@@ -213,8 +219,8 @@ export function HomePage() {
             </div>
             <h2 className="text-4xl font-bold text-white mb-4">Start transcribing today</h2>
             <p className="text-gray-400 text-lg mb-8">Join thousands of creators, journalists, and researchers. Free to start — no credit card required.</p>
-            <Button size="xl" variant="primary" iconRight={<ArrowRight size={18} />} onClick={() => navigate('/register')}>
-              Get Started Free
+            <Button size="xl" variant="primary" iconRight={<ArrowRight size={18} />} onClick={() => navigate(ctaPath)}>
+              {ctaLabel}
             </Button>
           </motion.div>
         </div>

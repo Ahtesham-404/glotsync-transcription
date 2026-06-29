@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  useRef,
   type ReactNode,
 } from 'react'
 import {
@@ -27,6 +28,7 @@ import {
   reauthenticateWithCredential,
 } from 'firebase/auth'
 import { auth, googleProvider } from '@/lib/firebase'
+import { queryClient } from '@/lib/queryClient'
 
 interface AuthContextValue {
   user: User | null
@@ -47,6 +49,8 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  // Track the previous user UID so we can flush the cache on user switch
+  const prevUidRef = useRef<string | null>(null)
 
   useEffect(() => {
     // Handle the redirect result when the user returns from Google sign-in.
@@ -56,6 +60,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      const newUid = firebaseUser?.uid ?? null
+
+      // If the user changed (logout or switch account), clear React Query cache
+      // so stale data from the previous session never leaks to the next user.
+      if (prevUidRef.current !== null && prevUidRef.current !== newUid) {
+        queryClient.clear()
+      }
+      prevUidRef.current = newUid
+
       setUser(firebaseUser)
       setLoading(false)
     })

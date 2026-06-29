@@ -19,7 +19,10 @@ export function useDashboardStats() {
     queryKey: ['dashboard', 'stats'],
     queryFn: async (): Promise<DashboardStats> => {
       try {
-        const { data } = await apiClient.get('/api/dashboard/stats')
+        const { data } = await apiClient.get('/api/dashboard/stats', {
+          // Short timeout so the dashboard renders quickly even if backend is slow
+          timeout: 8000,
+        })
         return data
       } catch {
         // Return empty stats rather than leaving the dashboard in a loading/error
@@ -27,9 +30,9 @@ export function useDashboardStats() {
         return EMPTY_STATS
       }
     },
-    staleTime: 1000 * 30,         // 30 seconds
-    refetchInterval: 1000 * 60,   // refresh every minute
-    // Never show a loading spinner for longer than 10 seconds
+    staleTime: 1000 * 30,           // 30 seconds
+    refetchInterval: 1000 * 60 * 5, // poll every 5 minutes (was every 1 minute)
     placeholderData: EMPTY_STATS,
+    gcTime: 1000 * 60 * 10,
   })
 }
